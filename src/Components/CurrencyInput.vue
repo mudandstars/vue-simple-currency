@@ -49,6 +49,10 @@ watch(
             emitUpdate()
         }
 
+        if (! localValue.value) {
+            emitUpdate()
+        }
+
         // remove all non-digits except the ','
         localValue.value = localValue.value.replace(/[^0-9,]/g, '')
     }

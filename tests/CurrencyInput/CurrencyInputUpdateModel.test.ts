@@ -24,6 +24,14 @@ describe('CurrencyInput emits correct update events', () => {
         expect(updateEvent![0][0]).toEqual(0)
     })
 
+    it('deleting everything emits with 0', async () => {
+        await fireEvent.input(inputElement.element, { target: { value: '' } })
+
+        const updateEvent = wrapper.emitted('update:modelValue')
+
+        expect(updateEvent![0][0]).toEqual(0)
+    })
+
     it('deleting the comma emits same value', async () => {
         await fireEvent.input(inputElement.element, { target: { value: '1000€' } })
         const updateEvent = wrapper.emitted('update:modelValue')
