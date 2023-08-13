@@ -26,7 +26,3 @@ npm i -S vue-simple-currency
     </template>
 }
 ```
-
-```
-
-```
