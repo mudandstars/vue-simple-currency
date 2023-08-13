@@ -1,0 +1,32 @@
+{
+	"name": "vue-simple-currency",
+	"version": "1.0.0",
+	"description": "A simple currency input for vue3 that works as expected.",
+	"main": "./src/Components/CurrencyInput.vue",
+	"scripts": {
+		"test": "vitest --run ./tests"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^9.3.1",
+		"@vitejs/plugin-vue": "^4.2.3",
+		"@vue/test-utils": "^2.4.1",
+		"jsdom": "^22.1.0",
+		"path": "^0.12.7",
+		"prettier": "^2.8.8",
+		"vite": "^4.0.0",
+		"vitest": "^0.32.2",
+		"vue-tsc": "^1.2.0"
+	},
+	"dependencies": {
+		"vue": "^3.3.4"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mudandstars/vue-simple-currency"
+	},
+	"keywords": [
+		"vue3"
+	],
+	"author": "Paul Sochiera",
+	"license": "ISC"
+}

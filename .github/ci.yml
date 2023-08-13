@@ -1,0 +1,11 @@
+name: Tests
+
+on: [push]
+
+jobs:
+    tests:
+            - name: Install Node.js dependencies
+              run: npm ci
+
+            - name: Run Vitests
+              run: npm run test
