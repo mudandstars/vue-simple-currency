@@ -21,7 +21,7 @@ npm i -S vue-simple-currency
 
 ```jsx
 {
-    ;<template>
+    <template>
         <CurrencyInputVue v-model="myNumberRef" />
     </template>
 }
