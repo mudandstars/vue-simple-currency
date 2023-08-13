@@ -7,6 +7,5 @@
     "bracketSameLine": false,
     "printWidth": 120,
     "singleAttributePerLine": true,
-    "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
     "pluginSearchDirs": false
 }
