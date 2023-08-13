@@ -2,8 +2,13 @@
 	"name": "vue-simple-currency",
 	"version": "1.0.0",
 	"description": "A simple currency input for vue3 that works as expected.",
-	"main": "./src/Components/CurrencyInput.vue",
-	"scripts": {
+    "main": "dist/VueSimpleCurrency.cjs.js",
+    "module": "dist/VueSimpleCurrency.es.js",
+    "unpkg": "dist/VueSimpleCurrency.umd.js",
+    "files": [
+      "dist"
+    ],
+    "scripts": {
         "build": "vue-tsc && vite build",
 		"test": "vitest --run ./tests"
 	},
