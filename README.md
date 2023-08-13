@@ -4,7 +4,7 @@
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/mudandstars/vue-simple-currency/ci.yml?branch=main&label=tests&style=flat-square)](https://github.com/mudandstars/vue-simple-currency/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![npm Downloads](https://badgen.net/npm/dw/vue-simple-currency?color=green)](https://www.npmjs.com/package/vue-simple-currency)
 
-This package provides a HTML input element that works for the € currency.
+This package provides a HTML input element that works for the Euro (€) currency.
 
 ## Installation
 
