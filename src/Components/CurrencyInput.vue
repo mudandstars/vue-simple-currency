@@ -21,8 +21,7 @@
 			emitUpdate();
 		}
 	}
-
-	const localValue = ref<string>(props.modelValue?.toString() || "0,00€");
+	const localValue = ref<string>(props.modelValue ? `${(props.modelValue / 10).toString()}` : "0,00€");
 
 	watch(
 		() => localValue.value,
@@ -130,4 +129,3 @@
 		</div>
 	</div>
 </template>
-../src/utils/formatCurrencyWithDots
