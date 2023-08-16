@@ -125,10 +125,12 @@ const displayValue = () => {
     const removingDot =
         ((clearedValue.replace(/[^0-9,]/g, '').length + 1) / 3) % 1 === 0 && lastAction.value === 'removed character'
 
-    if (previousCaretPosition) {
-        nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 1 : previousCaretPosition))
-        nextTick(() => setCursorPosition(removingDot ? previousCaretPosition - 1 : previousCaretPosition))
-    }
+    setTimeout(() => {
+        if (previousCaretPosition) {
+            nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 1 : previousCaretPosition))
+            nextTick(() => setCursorPosition(removingDot ? previousCaretPosition - 1 : previousCaretPosition))
+        }
+    }, 50)
 
     return `${formatCurrencyWithDots(clearedValue)},00€`
 }
