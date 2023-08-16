@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import formatCurrencyWithDots from '../utils/formatCurrencyWithDots'
 
 const props = defineProps<{
@@ -10,10 +10,6 @@ const emit = defineEmits<{
     'update:modelValue': [newValue: number]
 }>()
 
-const localValue = ref<string>(props.modelValue ? `${(props.modelValue / 100).toFixed(0).toString()},00€` : '0,00€')
-const inputRef = ref<HTMLInputElement>()
-const lastAction = ref<null | 'added character' | 'removed character'>(null)
-
 function handleChange(value: string) {
     const clearedValue = value[0] === '0' ? value.substring(1) : value
 
@@ -21,80 +17,40 @@ function handleChange(value: string) {
 
     if (value[value.length - 1] === '€' && value.includes(',00')) {
         emitUpdate()
-
-        if (value !== ',00€') {
-            lastAction.value = 'added character'
-        } else {
-            lastAction.value = 'removed character'
-        }
     }
 }
-
-function setCursorPosition(position: number | null) {
-    const inputEl = inputRef.value
-
-    if (inputEl && position !== null) {
-        inputEl.focus()
-
-        inputEl.setSelectionRange(position, position)
-    }
-}
-
-onMounted(() => {
-    nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
-})
+const localValue = ref<string>(props.modelValue ? `${(props.modelValue / 10).toString()}` : '0,00€')
 
 watch(
     () => localValue.value,
     async () => {
-
-        if (inputRef.value?.selectionStart && inputRef.value.selectionStart > localValue.value.indexOf(',0')) {
-            nextTick(() => setCursorPosition(localValue.value.indexOf(',0')))
-        }
-
         if (deletedComma(localValue.value)) {
-            nextTick(() => setCursorPosition(inputRef.value?.selectionStart || null))
-            localValue.value = localValue.value.substring(0, localValue.value.indexOf('00€€') + 1) + ',00€'
-            lastAction.value = null
+            localValue.value = localValue.value.slice(0, localValue.value.indexOf('00€€') + 1) + ',00€'
         }
 
         if (deletedLastElement(localValue.value)) {
-            localValue.value = localValue.value.substring(0, localValue.value.indexOf(',') - 1) + ',00€'
+            localValue.value = localValue.value.slice(0, localValue.value.indexOf(',') - 1) + ',00€'
 
             emitUpdate()
-
-            if (!localValue.value.substring(0, localValue.value.indexOf(',')).length) {
-                nextTick(() => setCursorPosition(1))
-            } else {
-                nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
-            }
-            lastAction.value = 'removed character'
         }
 
         if (addedZero(localValue.value)) {
             localValue.value = localValue.value.substring(0, localValue.value.indexOf(',')) + '0,00€'
 
             emitUpdate()
-            lastAction.value = 'added character'
         }
 
-        if (enteredNumberAtTheEnd(localValue.value)) {
+        if (enteredNumber(localValue.value)) {
             localValue.value =
-                localValue.value.substring(0, localValue.value.indexOf(',')) +
+                localValue.value.slice(0, localValue.value.indexOf(',')) +
                 localValue.value[localValue.value.length - 1] +
                 ',00€'
 
             emitUpdate()
-
-            nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
-            lastAction.value = 'added character'
         }
 
-        if (!localValue.value) {
+        if (! localValue.value) {
             emitUpdate()
-
-            lastAction.value = 'removed character'
-            nextTick(() => setCursorPosition(1))
         }
 
         // remove all non-digits except the ','
@@ -103,7 +59,7 @@ watch(
 )
 
 function emitUpdate() {
-    const value = centsValue(localValue.value)
+    const value = euroValue(localValue.value)
 
     if (!isNaN(value)) {
         emit('update:modelValue', value)
@@ -114,26 +70,14 @@ function emitUpdate() {
 
 const deletedLastElement = (value: string) =>
     value[value.length - 1] === '€' && value[value.length - 2] === '0' && value[value.length - 3] !== '€'
-const enteredNumberAtTheEnd = (value: string) =>
-    !isNaN(parseInt(value[value.length - 1])) && value[value.length - 1] !== '0'
+const enteredNumber = (value: string) => !isNaN(parseInt(value[value.length - 1])) && value[value.length - 1] !== '0'
 const deletedComma = (value: string) => value.includes('€€') && !value.includes(',')
 const addedZero = (value: string) => value.includes('€0€')
-const centsValue = (value: string) =>
-    parseInt(value[0] === '0' ? value.substring(1) : value.split(',')[0].replaceAll('.', '')) * 100
+const euroValue = (value: string) =>
+    parseInt(value[0] === '0' ? value.slice(1) : value.split(',')[0].replaceAll('.', '')) * 100
 
 const displayValue = () => {
-    let clearedValue = localValue.value.substring(0, localValue.value.indexOf(','))
-
-    const previousCaretPosition = inputRef.value?.selectionStart
-    const addingDot =
-        ((clearedValue.replace(/[^0-9,]/g, '').length - 1) / 3) % 1 === 0 && lastAction.value === 'added character'
-    const removingDot =
-        ((clearedValue.replace(/[^0-9,]/g, '').length + 1) / 3) % 1 === 0 && lastAction.value === 'removed character'
-
-    if (previousCaretPosition) {
-        nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 2 : previousCaretPosition))
-        nextTick(() => setCursorPosition(removingDot ? previousCaretPosition - 2 : previousCaretPosition))
-    }
+    let clearedValue = localValue.value.slice(0, localValue.value.indexOf(','))
 
     return `${formatCurrencyWithDots(clearedValue)},00€`
 }
@@ -141,7 +85,6 @@ const displayValue = () => {
 
 <template>
     <input
-        ref="inputRef"
         type="text"
         placeholder="0.00"
         :value="displayValue()"
