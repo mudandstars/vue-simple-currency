@@ -23,7 +23,6 @@ function handleChange(value: string) {
         emitUpdate()
 
         if (value !== ',00€') {
-            setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart + 1 : null)
             lastAction.value = 'added character'
         } else {
             lastAction.value = 'removed character'
@@ -60,9 +59,9 @@ watch(
             emitUpdate()
 
             if (!localValue.value.slice(0, localValue.value.indexOf(',')).length) {
-                setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart : null)
+                nextTick(() => setCursorPosition(1))
             } else {
-                setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart - 1 : null)
+                nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
             }
             lastAction.value = 'removed character'
         }
@@ -72,9 +71,7 @@ watch(
 
             emitUpdate()
 
-            nextTick(() =>
-                setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart + 1 : null)
-            )
+            nextTick(() => nextTick(() => setCursorPosition(localValue.value.indexOf(',00€'))))
             lastAction.value = 'added character'
         }
 
@@ -86,15 +83,15 @@ watch(
 
             emitUpdate()
 
-            setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart + 1 : null)
+            nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
             lastAction.value = 'added character'
         }
 
         if (!localValue.value) {
             emitUpdate()
 
-            nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
             lastAction.value = 'removed character'
+            nextTick(() => setCursorPosition(1))
         }
 
         // remove all non-digits except the ','
