@@ -54,11 +54,11 @@ watch(
         }
 
         if (deletedLastElement(localValue.value)) {
-            localValue.value = localValue.value.slice(0, localValue.value.indexOf(',') - 1) + ',00€'
+            localValue.value = localValue.value.substring(0, localValue.value.indexOf(',') - 1) + ',00€'
 
             emitUpdate()
 
-            if (!localValue.value.slice(0, localValue.value.indexOf(',')).length) {
+            if (!localValue.value.substring(0, localValue.value.indexOf(',')).length) {
                 nextTick(() => setCursorPosition(1))
             } else {
                 nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
@@ -70,14 +70,12 @@ watch(
             localValue.value = localValue.value.substring(0, localValue.value.indexOf(',')) + '0,00€'
 
             emitUpdate()
-
-            nextTick(() => nextTick(() => setCursorPosition(localValue.value.indexOf(',00€'))))
             lastAction.value = 'added character'
         }
 
         if (enteredNumberAtTheEnd(localValue.value)) {
             localValue.value =
-                localValue.value.slice(0, localValue.value.indexOf(',')) +
+                localValue.value.substring(0, localValue.value.indexOf(',')) +
                 localValue.value[localValue.value.length - 1] +
                 ',00€'
 
@@ -116,17 +114,16 @@ const enteredNumberAtTheEnd = (value: string) =>
 const deletedComma = (value: string) => value.includes('€€') && !value.includes(',')
 const addedZero = (value: string) => value.includes('€0€')
 const centsValue = (value: string) =>
-    parseInt(value[0] === '0' ? value.slice(1) : value.split(',')[0].replaceAll('.', '')) * 100
+    parseInt(value[0] === '0' ? value.substring(1) : value.split(',')[0].replaceAll('.', '')) * 100
 
 const displayValue = () => {
     let clearedValue = localValue.value.substring(0, localValue.value.indexOf(','))
 
     const previousCaretPosition = inputRef.value?.selectionStart
     const addingDot =
-        ((localValue.value.replace(/[^0-9,]/g, '').length - 1) / 3) % 1 === 0 && lastAction.value === 'added character'
+        ((clearedValue.replace(/[^0-9,]/g, '').length - 1) / 3) % 1 === 0 && lastAction.value === 'added character'
     const removingDot =
-        ((localValue.value.replace(/[^0-9,]/g, '').length + 1) / 3) % 1 === 0 &&
-        lastAction.value === 'removed character'
+        ((clearedValue.replace(/[^0-9,]/g, '').length + 1) / 3) % 1 === 0 && lastAction.value === 'removed character'
 
     if (previousCaretPosition) {
         nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 1 : previousCaretPosition))
