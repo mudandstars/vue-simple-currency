@@ -47,6 +47,11 @@ onMounted(() => {
 watch(
     () => localValue.value,
     async () => {
+
+        if (inputRef.value?.selectionStart && inputRef.value.selectionStart > localValue.value.indexOf(',0')) {
+            nextTick(() => setCursorPosition(localValue.value.indexOf(',0')))
+        }
+
         if (deletedComma(localValue.value)) {
             nextTick(() => setCursorPosition(inputRef.value?.selectionStart || null))
             localValue.value = localValue.value.substring(0, localValue.value.indexOf('00€€') + 1) + ',00€'
@@ -125,12 +130,10 @@ const displayValue = () => {
     const removingDot =
         ((clearedValue.replace(/[^0-9,]/g, '').length + 1) / 3) % 1 === 0 && lastAction.value === 'removed character'
 
-    setTimeout(() => {
-        if (previousCaretPosition) {
-            nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 1 : previousCaretPosition))
-            nextTick(() => setCursorPosition(removingDot ? previousCaretPosition - 1 : previousCaretPosition))
-        }
-    }, 50)
+    if (previousCaretPosition) {
+        nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 2 : previousCaretPosition))
+        nextTick(() => setCursorPosition(removingDot ? previousCaretPosition - 2 : previousCaretPosition))
+    }
 
     return `${formatCurrencyWithDots(clearedValue)},00€`
 }
