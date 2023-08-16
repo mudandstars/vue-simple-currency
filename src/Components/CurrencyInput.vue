@@ -10,16 +10,12 @@ const emit = defineEmits<{
     'update:modelValue': [newValue: number]
 }>()
 
-const localValue = ref<string>(props.modelValue ? `${(props.modelValue / 10).toString()}` : '0,00€')
+const localValue = ref<string>(props.modelValue ? `${(props.modelValue / 100).toFixed(0).toString()},00€` : '0,00€')
 const inputRef = ref<HTMLInputElement>()
+const lastAction = ref<null | 'added character' | 'removed character'>(null)
 
 function handleChange(value: string) {
     const clearedValue = value[0] === '0' ? value.substring(1) : value
-    console.log('shifting caret position..')
-
-    const previousCaretPosition = inputRef.value?.selectionStart as number
-    const previousValueLength = Math.ceil(localValue.value.replace(/[^0-9,]/g, '').length / 3)
-    const newValueLength = Math.ceil(value.replace(/[^0-9,]/g, '').length / 3)
 
     localValue.value = clearedValue + '€'
 
@@ -27,17 +23,18 @@ function handleChange(value: string) {
         emitUpdate()
 
         if (value !== ',00€') {
-            setCursorPosition(
-                newValueLength > previousValueLength ? previousCaretPosition + 2 : previousCaretPosition + 1
-            )
+            setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart + 1 : null)
+            lastAction.value = 'added character'
+        } else {
+            lastAction.value = 'removed character'
         }
     }
 }
 
-function setCursorPosition(position: number) {
+function setCursorPosition(position: number | null) {
     const inputEl = inputRef.value
 
-    if (inputEl) {
+    if (inputEl && position !== null) {
         inputEl.focus()
 
         inputEl.setSelectionRange(position, position)
@@ -45,14 +42,16 @@ function setCursorPosition(position: number) {
 }
 
 onMounted(() => {
-    setCursorPosition(localValue.value.indexOf(',00€'))
+    nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
 })
 
 watch(
     () => localValue.value,
     async () => {
         if (deletedComma(localValue.value)) {
+            nextTick(() => setCursorPosition(inputRef.value?.selectionStart || null))
             localValue.value = localValue.value.substring(0, localValue.value.indexOf('00€€') + 1) + ',00€'
+            lastAction.value = null
         }
 
         if (deletedLastElement(localValue.value)) {
@@ -60,7 +59,12 @@ watch(
 
             emitUpdate()
 
-            nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
+            if (!localValue.value.slice(0, localValue.value.indexOf(',')).length) {
+                setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart : null)
+            } else {
+                setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart - 1 : null)
+            }
+            lastAction.value = 'removed character'
         }
 
         if (addedZero(localValue.value)) {
@@ -68,7 +72,10 @@ watch(
 
             emitUpdate()
 
-            setCursorPosition(localValue.value.indexOf(',00€'))
+            nextTick(() =>
+                setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart + 1 : null)
+            )
+            lastAction.value = 'added character'
         }
 
         if (enteredNumberAtTheEnd(localValue.value)) {
@@ -79,13 +86,15 @@ watch(
 
             emitUpdate()
 
-            setCursorPosition(localValue.value.indexOf(',00€'))
+            setCursorPosition(inputRef.value?.selectionStart ? inputRef.value?.selectionStart + 1 : null)
+            lastAction.value = 'added character'
         }
 
         if (!localValue.value) {
             emitUpdate()
 
             nextTick(() => setCursorPosition(localValue.value.indexOf(',00€')))
+            lastAction.value = 'removed character'
         }
 
         // remove all non-digits except the ','
@@ -113,7 +122,15 @@ const centsValue = (value: string) =>
     parseInt(value[0] === '0' ? value.slice(1) : value.split(',')[0].replaceAll('.', '')) * 100
 
 const displayValue = () => {
-    let clearedValue = localValue.value.slice(0, localValue.value.indexOf(','))
+    let clearedValue = localValue.value.substring(0, localValue.value.indexOf(','))
+
+    const previousCaretPosition = inputRef.value?.selectionStart
+    const addingDot =
+        ((localValue.value.replace(/[^0-9,]/g, '').length - 1) / 3) % 1 === 0 && lastAction.value === 'added character'
+
+    if (previousCaretPosition) {
+        nextTick(() => setCursorPosition(addingDot ? previousCaretPosition + 1 : previousCaretPosition))
+    }
 
     return `${formatCurrencyWithDots(clearedValue)},00€`
 }

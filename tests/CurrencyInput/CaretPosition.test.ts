@@ -51,25 +51,33 @@ describe('CurrencyInput Caret is at the correct position', async () => {
         expect(inputElement.selectionStart).toBe(inputElement.value.indexOf(',00€'))
     })
 
-    test('adding a value from the end sets the caret to the start position', async () => {
-        await fireEvent.input(inputElement, { target: { value: '10,00€5' } })
+    test('adding a value from the end sets the caret to the position before the comma', async () => {
+        wrapper.vm.setCursorPosition(2)
+        await fireEvent.input(inputElement, { target: { value: '105,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(inputElement.value.indexOf(',00€'))
 
-        await fireEvent.input(inputElement, { target: { value: '10,00€0' } })
+        wrapper.vm.setCursorPosition(2)
+        await fireEvent.input(inputElement, { target: { value: '100,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(inputElement.value.indexOf(',00€'))
     })
 
     test('removing a value from the end sets the caret to the start position', async () => {
+        wrapper.vm.setCursorPosition(2)
         await fireEvent.input(inputElement, { target: { value: '10,00' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(inputElement.value.indexOf(',00€'))
     })
 
     it('deleting the last and only character sets the caret to the default position', async () => {
         await fireEvent.input(inputElement, { target: { value: ',00€' } })
-        expect(inputElement.selectionStart).toBe(inputElement.value.indexOf(',00€'))
+        await wrapper.vm.$nextTick()
+        expect(inputElement.selectionStart).toBe(1)
 
         await fireEvent.input(inputElement, { target: { value: '0,00' } })
-        expect(inputElement.selectionStart).toBe(inputElement.value.indexOf(',00€'))
+        await wrapper.vm.$nextTick()
+        expect(inputElement.selectionStart).toBe(1)
     })
 
     it('deleting everything sets the caret to the default position', async () => {
@@ -78,34 +86,34 @@ describe('CurrencyInput Caret is at the correct position', async () => {
     })
 
     it('adding a number so the caret would be moved because of the dot-format keeps the cursor there', async () => {
-        await fireEvent.input(inputElement, { target: { value: '3,00€' } })
-        wrapper.vm.setCursorPosition(0)
-        await fireEvent.input(inputElement, { target: { value: '33,00€' } })
-        expect(inputElement.selectionStart).toBe(1)
-
-        await fireEvent.input(inputElement, { target: { value: '31,00€' } })
         wrapper.vm.setCursorPosition(1)
-        await fireEvent.input(inputElement, { target: { value: '301,00€' } })
+        await fireEvent.input(inputElement, { target: { value: '33,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(2)
 
+        wrapper.vm.setCursorPosition(1)
         await fireEvent.input(inputElement, { target: { value: '301,00€' } })
+        await wrapper.vm.$nextTick()
+        expect(inputElement.selectionStart).toBe(2)
+
         wrapper.vm.setCursorPosition(2)
         await fireEvent.input(inputElement, { target: { value: '3051,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(4)
 
-        await fireEvent.input(inputElement, { target: { value: '3.151,00€' } })
         wrapper.vm.setCursorPosition(3)
         await fireEvent.input(inputElement, { target: { value: '3.1051,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(4)
 
-        await fireEvent.input(inputElement, { target: { value: '31.051,00€' } })
         wrapper.vm.setCursorPosition(5)
         await fireEvent.input(inputElement, { target: { value: '310.511,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(6)
 
-        await fireEvent.input(inputElement, { target: { value: '310.511,00€' } })
         wrapper.vm.setCursorPosition(4)
         await fireEvent.input(inputElement, { target: { value: '310.2511,00€' } })
+        await wrapper.vm.$nextTick()
         expect(inputElement.selectionStart).toBe(6)
     })
 })
