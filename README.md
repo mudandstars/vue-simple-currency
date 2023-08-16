@@ -19,9 +19,7 @@ npm i -S vue-simple-currency
 2. The input handles all user inputs and updates the ref with the cent-value
 
 ```jsx
-{
-    <template>
-        <CurrencyInputVue v-model="myNumberRef" />
-    </template>
-}
+<template>
+    <CurrencyInputVue v-model="myNumberRef" />
+</template>
 ```
