@@ -1,6 +1,6 @@
 {
 	"name": "vue-simple-currency",
-	"version": "1.3.0",
+	"version": "1.3.2",
 	"description": "A simple currency input for vue3 that works as expected.",
 	"type": "module",
 	"files": [

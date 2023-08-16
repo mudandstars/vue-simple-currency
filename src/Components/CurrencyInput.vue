@@ -15,6 +15,7 @@ const inputRef = ref<HTMLInputElement>()
 
 function handleChange(value: string) {
     const clearedValue = value[0] === '0' ? value.substring(1) : value
+    console.log('shifting caret position..')
 
     const previousCaretPosition = inputRef.value?.selectionStart as number
     const previousValueLength = Math.ceil(localValue.value.replace(/[^0-9,]/g, '').length / 3)
@@ -26,7 +27,9 @@ function handleChange(value: string) {
         emitUpdate()
 
         if (value !== ',00€') {
-            setCursorPosition(newValueLength > previousValueLength ? previousCaretPosition + 2 : previousCaretPosition + 1)
+            setCursorPosition(
+                newValueLength > previousValueLength ? previousCaretPosition + 2 : previousCaretPosition + 1
+            )
         }
     }
 }
