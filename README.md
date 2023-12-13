@@ -5,6 +5,8 @@
 
 This package provides a HTML input element that works for the Euro (€) currency.
 
+# There are some issues with the component, mainly with cursor placement upon certain actions, so test if this is suited for you.
+
 ## Installation
 
 You can install the package via composer:
